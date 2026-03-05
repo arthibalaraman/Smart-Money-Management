@@ -24,6 +24,18 @@ pipeline {
             }
         }
 
+        stage('Cleanup') {
+            steps {
+                echo '🧹 Cleaning up old containers and ports...'
+                sh '''
+                    docker compose -f ${DOCKER_COMPOSE_FILE} down --remove-orphans --timeout 15 || true
+                    # Force kill any process on our app ports if they are still busy (using fuser or lsof)
+                    (if command -v fuser >/dev/null; then fuser -k 3000/tcp || true; fuser -k 5000/tcp || true; fi)
+                    (if command -v lsof >/dev/null; then lsof -ti:3000 | xargs kill -9 || true; lsof -ti:5000 | xargs kill -9 || true; fi)
+                '''
+            }
+        }
+
         stage('Lint & Validate') {
             steps {
                 echo '🔍 Validating Docker Compose file...'
@@ -42,16 +54,6 @@ pipeline {
             }
         }
 
-        stage('Stop Old Containers') {
-            steps {
-                echo '🛑 Removing old containers and orphans...'
-                sh '''
-                    docker compose -f ${DOCKER_COMPOSE_FILE} down \
-                        --remove-orphans \
-                        --timeout 30
-                '''
-            }
-        }
 
         stage('Deploy') {
             steps {

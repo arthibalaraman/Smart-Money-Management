@@ -71,7 +71,7 @@ pipeline {
                 sh '''
                     # Wait up to 60 seconds for backend to respond
                     attempt=0
-                    until curl -sf http://localhost:5000/api/all-entries > /dev/null || [ $attempt -ge 12 ]; do
+                    until curl -sf http://localhost:5000/api/health > /dev/null || [ $attempt -ge 12 ]; do
                         echo "Waiting for backend... ($attempt/12)"
                         sleep 5
                         attempt=$((attempt+1))

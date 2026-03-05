@@ -36,6 +36,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Health check endpoint (public)
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 /* ─── JWT Middleware ─────────────────────────────────────────── */
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Money Manager Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        h1 {
+            color: #4f46e5;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #1e1b4b;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #4338ca;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9fafb;
+            color: #4338ca;
+        }
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #9ca3af;
+        }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Money Manager (SmartTracker) — Project Documentation</h1>
+
+    <h2>1. Project Overview</h2>
+    <p><strong>Smart Money Manager</strong> is a modern, dynamic web and mobile application designed for flexible expense and data tracking. Unlike rigid expense trackers, this application allows users to build their own "Forms" with custom fields, making it suitable for tracking anything from daily spending to office supplies or gym logs.</p>
+
+    <h3>Key Features:</h3>
+    <ul>
+        <li><strong>Dynamic Form Builder</strong>: Users can define their own tracking forms by choosing from various fields (Date, Amount, Category, Vendor, etc.).</li>
+        <li><strong>Data Management</strong>: Full CRUD (Create, Read, Update, Delete) functionality for both forms and their entries.</li>
+        <li><strong>Advanced Reporting</strong>:
+            <ul>
+                <li>Monthly summaries with numeric totals.</li>
+                <li>Interactive bar charts for monthly overview.</li>
+                <li>One-click exports to <strong>PDF</strong> and <strong>CSV</strong>.</li>
+            </ul>
+        </li>
+        <li><strong>Cross-Platform</strong>: Built for Web and Mobile (Android/iOS) using React and Capacitor.</li>
+        <li><strong>Premium UI</strong>: Glassmorphism design with soft gradients and responsive sidebar navigation.</li>
+    </ul>
+
+    <hr>
+
+    <h2>2. Technical Stack</h2>
+    <ul>
+        <li><strong>Frontend</strong>: React (v19), Axios for API communication.</li>
+        <li><strong>Styling</strong>: Vanilla CSS with Modern CSS Variables (Custom properties).</li>
+        <li><strong>Backend</strong>: Node.js with Express framework.</li>
+        <li><strong>Database</strong>: PostgreSQL with Prisma ORM for type-safe data access.</li>
+        <li><strong>Mobile</strong>: Capacitor (Cross-platform bridge).</li>
+        <li><strong>Notifications</strong>: React Hot Toast for real-time feedback.</li>
+        <li><strong>Exporting</strong>: jsPDF and autoTable for PDF generation.</li>
+    </ul>
+
+    <hr>
+
+    <h2>3. Database Schema (PostgreSQL)</h2>
+    <p>The database is managed via Prisma. Below are the core models:</p>
+
+    <h3>Form Model</h3>
+    <p>Stores the definition of a user-created tracking form.</p>
+    <ul>
+        <li><code>id</code> (Int): Primary Key.</li>
+        <li><code>name</code> (String): Title of the form.</li>
+        <li><code>fields</code> (String): JSON string storing the configuration of active fields.</li>
+    </ul>
+
+    <h3>FormEntry Model</h3>
+    <p>Stores the actual data submitted via a Form.</p>
+    <ul>
+        <li><code>id</code> (Int): Primary Key.</li>
+        <li><code>formId</code> (Int): Foreign Key referencing <code>Form</code>.</li>
+        <li><code>data</code> (String): JSON string containing value mapping for custom fields.</li>
+        <li><code>date</code> (String): Date of the record.</li>
+    </ul>
+
+    <hr>
+
+    <h2>4. API Documentation</h2>
+
+    <h3>Forms API</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>GET</code></td>
+                <td><code>/api/forms</code></td>
+                <td>Retrieves all user-created forms.</td>
+            </tr>
+            <tr>
+                <td><code>POST</code></td>
+                <td><code>/api/forms</code></td>
+                <td>Creates a new custom form.</td>
+            </tr>
+            <tr>
+                <td><code>PUT</code></td>
+                <td><code>/api/forms/:id</code></td>
+                <td>Updates form name or field configuration.</td>
+            </tr>
+            <tr>
+                <td><code>DELETE</code></td>
+                <td><code>/api/forms/:id</code></td>
+                <td>Removes a form and all its associated data.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Entries API</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>GET</code></td>
+                <td><code>/api/forms/:formId/entries</code></td>
+                <td>Fetch all records for a specific form.</td>
+            </tr>
+            <tr>
+                <td><code>POST</code></td>
+                <td><code>/api/forms/:formId/entries</code></td>
+                <td>Add a new record (entry) to a form.</td>
+            </tr>
+            <tr>
+                <td><code>PUT</code></td>
+                <td><code>/api/entries/:id</code></td>
+                <td>Update an existing record's values.</td>
+            </tr>
+            <tr>
+                <td><code>DELETE</code></td>
+                <td><code>/api/entries/:id</code></td>
+                <td>Remove a specific record.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>5. Folder Structure</h2>
+    <ul>
+        <li><code>src/components/</code>: Modular React components (FormsList, FormView, ReportsPage).</li>
+        <li><code>src/App.js</code>: Main entry point with routing and global state.</li>
+        <li><code>src/App.css</code>: Core design system and layout styling.</li>
+        <li><code>server/index.js</code>: Express server implementation and API routing.</li>
+        <li><code>prisma/</code>: Database schema and migration files.</li>
+        <li><code>android/</code>: Native Android project generated by Capacitor.</li>
+    </ul>
+
+    <hr>
+
+    <h2>6. Setup & Installation</h2>
+    <h3>Web Development</h3>
+    <ol>
+        <li>Install dependencies: <code>npm install</code></li>
+        <li>Start development server: <code>npm run dev</code> (Runs both React & Node server).</li>
+    </ol>
+
+    <h3>Mobile Deployment</h3>
+    <ol>
+        <li>Build the React project: <code>npm run build</code></li>
+        <li>Sync with Capacitor: <code>npx cap sync</code></li>
+        <li>Open in Android Studio: <code>npx cap open android</code></li>
+        <li>Run on a physical device/emulator.</li>
+    </ol>
+
+    <hr>
+
+    <h2>7. Future Enhancements</h2>
+    <ul>
+        <li>User Authentication (Login/Signup).</li>
+        <li>Cloud Image Upload for receipts.</li>
+        <li>Multi-currency support.</li>
+        <li>Push notifications for daily reminders.</li>
+    </ul>
+
+    <div class="footer">
+        Generated for Smart Money Manager Project &copy; 2026
+    </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+# ─────────────────────────────────────────────────────────────────────
+#  SmartTracker – Docker Compose
+#
+#  Containers:
+#    frontend  → React app served by Nginx (port 3000)
+#    backend   → Express + Prisma (port 5000)   ─┐ "backend & db" group
+#    db        → PostgreSQL 15                  ─┘
+#
+#  To start:
+#    docker compose up --build
+#
+#  To auto-rebuild & remove old containers when you edit code:
+#    docker compose up --build --force-recreate --remove-orphans
+#
+#  To watch for file changes and live-rebuild (Docker Compose v2.22+):
+#    docker compose watch
+# ─────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Container 1: Frontend (React → Nginx) ───────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/src
+        - action: rebuild
+          path: ./frontend/public
+        - action: sync+restart
+          path: ./frontend/package.json
+          target: /app/package.json
+
+  # ── Container 2a: Backend (Express + Prisma) ────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:CBAdmin@123@db:5432/smart_money_manager?schema=public
+      - PORT=5000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./backend/server
+          target: /app/server
+        - action: rebuild
+          path: ./backend/package.json
+        - action: rebuild
+          path: ./backend/prisma/schema.prisma
+
+  # ── Container 2b: Database (PostgreSQL) ─────────────────────────
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: CBAdmin@123
+      POSTGRES_DB: smart_money_manager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# ── Persistent volume for DB data ────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
+# ── Internal network ──────────────────────────────────────────────
+networks:
+  app-network:
+    driver: bridge

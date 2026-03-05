@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">smart-money-manager</string>
+    <string name="title_activity_main">smart-money-manager</string>
+    <string name="package_name">com.arthi.app</string>
+    <string name="custom_url_scheme">com.arthi.app</string>
+</resources>

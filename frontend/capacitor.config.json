@@ -1,0 +1,8 @@
+{
+  "appId": "com.arthi.app",
+  "appName": "smart-money-manager",
+  "webDir": "build",
+  "server": {
+    "cleartext": true
+  }
+}

@@ -81,6 +81,8 @@ pipeline {
                         echo "❌ Backend health check failed after 60s."
                         echo "--- Container Logs (Backend) ---"
                         docker compose -f ${DOCKER_COMPOSE_FILE} logs backend
+                        echo "--- Container Logs (Database) ---"
+                        docker compose -f ${DOCKER_COMPOSE_FILE} logs db
                         echo "--- Container Status ---"
                         docker compose -f ${DOCKER_COMPOSE_FILE} ps
                         exit 1

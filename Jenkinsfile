@@ -26,12 +26,24 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                echo '🧹 Cleaning up old containers and ports...'
+                echo '🔍 Diagnosing port status before cleanup...'
                 sh '''
+                    # Show what is currently using the ports
+                    (lsof -i:3000 || true)
+                    (netstat -tulpn | grep :3000 || true)
+                    
+                    echo '🧹 Cleaning up old containers and ports...'
                     docker compose -f ${DOCKER_COMPOSE_FILE} down --remove-orphans --timeout 15 || true
-                    # Force kill any process on our app ports if they are still busy (using fuser or lsof)
-                    (if command -v fuser >/dev/null; then fuser -k 3000/tcp || true; fuser -k 5000/tcp || true; fi)
-                    (if command -v lsof >/dev/null; then lsof -ti:3000 | xargs kill -9 || true; lsof -ti:5000 | xargs kill -9 || true; fi)
+                    
+                    # Force kill any process on our app ports if they are still busy
+                    # Using a loop to avoid 'kill' usage errors if no PID is found
+                    for port in 3000 5000; do
+                        pid=$(lsof -ti:$port || true)
+                        if [ -n "$pid" ]; then
+                            echo "Found process $pid on port $port. Killing..."
+                            kill -9 $pid || true
+                        fi
+                    done
                 '''
             }
         }

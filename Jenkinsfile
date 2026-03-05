@@ -71,22 +71,29 @@ pipeline {
                 sh '''
                     # Wait up to 60 seconds for backend to respond
                     attempt=0
-                    until curl -sf http://localhost:5000/api/expenses > /dev/null || [ $attempt -ge 12 ]; do
+                    until curl -sf http://localhost:5000/api/all-entries > /dev/null || [ $attempt -ge 12 ]; do
                         echo "Waiting for backend... ($attempt/12)"
                         sleep 5
                         attempt=$((attempt+1))
                     done
 
                     if [ $attempt -ge 12 ]; then
-                        echo "❌ Backend did not become healthy in time."
+                        echo "❌ Backend health check failed after 60s."
+                        echo "--- Container Logs (Backend) ---"
                         docker compose -f ${DOCKER_COMPOSE_FILE} logs backend
+                        echo "--- Container Status ---"
+                        docker compose -f ${DOCKER_COMPOSE_FILE} ps
                         exit 1
                     fi
 
                     echo "✅ Backend is healthy!"
 
                     # Wait for frontend
-                    curl -sf http://localhost:3000 > /dev/null && echo "✅ Frontend is healthy!" || echo "⚠️ Frontend check failed (non-fatal)"
+                    if curl -sf http://localhost:3000 > /dev/null; then
+                        echo "✅ Frontend is healthy!"
+                    else
+                        echo "⚠️ Frontend check failed (non-fatal)"
+                    fi
                 '''
             }
         }

@@ -19,7 +19,7 @@ const GET_API_URL = () => {
     console.log(`[Android] Connecting to backend at 192.168.29.60`);
     return `http://192.168.29.60:5000`;
   }
-  return process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  return process.env.REACT_APP_API_URL || 'http://192.168.29.45:5000';
 };
 
 const API_URL = GET_API_URL();

@@ -14,9 +14,10 @@ import AuthPage from './components/AuthPage';
 // API URL routing
 const GET_API_URL = () => {
   if (Capacitor.getPlatform() === 'android') {
-    // Using ADB reverse tcp:5000 tcp:5000 for direct USB connection
-    console.log(`[Android] Attempting connection via localhost (via ADB)`);
-    return `http://localhost:5000`;
+    
+    // Connect to the PC's local IP (ensure both are on same WiFi)
+    console.log(`[Android] Connecting to backend at 192.168.29.60`);
+    return `http://192.168.29.60:5000`;
   }
   return process.env.REACT_APP_API_URL || 'http://localhost:5000';
 };

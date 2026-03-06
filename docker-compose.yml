@@ -2,7 +2,7 @@
 #  SmartTracker – Docker Compose
 #
 #  Containers:
-#    frontend  → React app served by Nginx (port 3000)
+#    frontend  → React app served by Nginx (port 3001)
 #    backend   → Express + Prisma (port 5000)   ─┐ "backend & db" group
 #    db        → PostgreSQL 15                  ─┘
 #
@@ -24,7 +24,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3001:80"
     networks:
       - app-network
     develop:

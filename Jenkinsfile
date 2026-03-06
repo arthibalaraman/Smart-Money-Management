@@ -29,21 +29,21 @@ pipeline {
                 echo '🔍 Diagnosing port status before cleanup...'
                 sh '''
                     # Show what is currently using the ports
-                    (lsof -i:3000 || true)
-                    (netstat -tulpn | grep :3000 || true)
+                    (lsof -i:3001 || true)
+                    (netstat -tulpn | grep :3001 || true)
                     
                     echo '🧹 Cleaning up old containers and ports...'
                     
                     # 1. Stop containers belonging to THIS project
                     docker compose -f ${DOCKER_COMPOSE_FILE} down --remove-orphans --timeout 15 || true
                     
-                    # 2. Stop ANY docker container using our target ports (3000, 5000)
-                    echo "🔍 Checking for any other containers on ports 3000/5000..."
-                    docker ps -q --filter "publish=3000" | xargs -r docker stop || true
+                    # 2. Stop ANY docker container using our target ports (3001, 5000)
+                    echo "🔍 Checking for any other containers on ports 3001/5000..."
+                    docker ps -q --filter "publish=3001" | xargs -r docker stop || true
                     docker ps -q --filter "publish=5000" | xargs -r docker stop || true
                     
                     # 3. Force kill any remaining host processes on these ports
-                    for port in 3000 5000; do
+                    for port in 3001 5000; do
                         pid=$(lsof -ti:$port || true)
                         if [ -n "$pid" ]; then
                             echo "Found process $pid on port $port. Killing..."
@@ -111,7 +111,7 @@ pipeline {
                     echo "✅ Backend is healthy!"
 
                     # Wait for frontend
-                    if curl -sf http://localhost:3000 > /dev/null; then
+                    if curl -sf http://localhost:3001 > /dev/null; then
                         echo "✅ Frontend is healthy!"
                     else
                         echo "⚠️ Frontend check failed (non-fatal)"

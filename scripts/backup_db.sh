@@ -7,8 +7,9 @@
 # ─────────────────────────────────────────────────────────────────────
 
 # Configuration
-# Note: Ensure this script is run from the project root or adjust paths
-BACKUP_DIR="./backups"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+BACKUP_DIR="$PROJECT_ROOT/backups"
 DB_NAME="smart_money_manager"
 DB_USER="postgres"
 RETENTION_DAYS=3
@@ -24,7 +25,7 @@ echo "🚀 [$(date)] Starting backup of $DB_NAME..."
 
 # Execute pg_dump inside the docker container
 # -T is used to prevent "input device is not a TTY" error in cron/Jenkins
-docker compose exec -T db pg_dump -U "$DB_USER" "$DB_NAME" > "$FILENAME"
+docker compose -f "$PROJECT_ROOT/docker-compose.yml" exec -T db pg_dump -U "$DB_USER" "$DB_NAME" > "$FILENAME"
 
 if [ $? -eq 0 ]; then
     echo "✅ Backup successfully created: $FILENAME"

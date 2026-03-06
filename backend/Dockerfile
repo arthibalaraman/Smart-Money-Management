@@ -16,4 +16,5 @@ EXPOSE 5000
 
 # Push DB schema then start the server
 # Push DB schema then start the server with logging
-CMD ["sh", "-c", "echo 'Running prisma db push...' && npx prisma db push && echo 'Starting server...' && node server/index.js || (echo 'Backend failed to start' && exit 1)"]
+# Push DB schema then start the server with logging
+CMD ["sh", "-c", "echo 'Running prisma db push...' && npx prisma db push --accept-data-loss && echo 'Starting server...' && node server/index.js || (echo '❌ Backend failed to start' && exit 1)"]

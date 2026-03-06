@@ -126,7 +126,7 @@ pipeline {
             echo '''
             ✅ Pipeline SUCCESS
             ─────────────────────────────
-            🌐 Frontend : http://localhost:3000
+            🌐 Frontend : http://localhost:3001
             ⚙️  Backend  : http://localhost:5000
             🗄️  Database : PostgreSQL (port 5432)
             '''

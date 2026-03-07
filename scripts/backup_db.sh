@@ -14,6 +14,9 @@ DB_NAME="smart_money_manager"
 DB_USER="postgres"
 RETENTION_DAYS=3
 
+# Added for cron compatibility
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
 # Create backup directory if it doesn't exist
 mkdir -p "$BACKUP_DIR"
 
@@ -22,6 +25,12 @@ TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 FILENAME="$BACKUP_DIR/db_backup_$TIMESTAMP.sql"
 
 echo "🚀 [$(date)] Starting backup of $DB_NAME..."
+
+# Check if the database container is running
+if ! docker compose -f "$PROJECT_ROOT/docker-compose.yml" ps --format "{{.State}}" db | grep -q "running"; then
+    echo "❌ Error: Database container 'db' is not running!"
+    exit 1
+fi
 
 # Execute pg_dump inside the docker container
 # -T is used to prevent "input device is not a TTY" error in cron/Jenkins

@@ -14,6 +14,9 @@ DB_NAME="smart_money_manager"
 DB_USER="postgres"
 RETENTION_DAYS=3
 
+# Match Jenkins configuration
+export COMPOSE_PROJECT_NAME="smarttracker"
+
 # Added for cron compatibility
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
